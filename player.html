@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Player Topzeira - Matheus</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="_css/bootstrap.css"/>
+	<meta name="viewport" content="width=device-width, shrink-to-fit=no, initial-scale=1">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+	<style type="text/css">
+		video{
+			width: 600px;
+		}
+		div#video-container{
+			padding-top: 40px;
+			width: 600px;
+		}
+	</style>
+
+</head>
+<body class="bg-dark">
+	<header>
+		<h1 style="border-radius: 7px; border: 1px" class="mt-3 ml-4 text-white d-inline-block p-3 bg-danger h4">Player - Matheus :3</h1>
+	</header>
+	<div class="container-fluid">
+		<div class="ml-4" id="video-container">
+			<video id="video-player" onclick="togglePlay();">
+				<source src="./media/video.mp4" type="video/mp4">
+				Seu navegador não suporta este tipo de mídia.
+			</video>
+			<div id="videoTimeline">
+				<span class="text-white" id="currentVideoTime">00:00</span>
+				<input oninput="sincronizarTempo();" style="width: 80%;" class="custom-range pt-1 mx-2" id="timelineRange" type="range" min="0" max="100" value="0">
+				<span class="text-white" id="endVideoTime">00:00</span>
+			</div>
+			<div class="bg-white container-fluid py-1" id="controller">
+				<button id="playbtnicon" type="button" onclick="togglePlay();" class="btn btn-primary"><i class="fas fa-pause"></i></button>
+				<button id="volumeIcon" type="button" onclick="toggleMute();" class="btn btn-primary"><i class='fas fa-volume-up'></i></button>
+				<input class="custom-range w-25 pt-3" id="volumeRangeInput" type="range" min="0" max="100" value="100" onInput="setVolume(volumeRangeInput.value/100);">
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		const video = document.getElementById("video-player");
+		const btnPlayIcon = document.getElementById("playbtnicon");
+		const volumeRangeInput = document.getElementById('volumeRangeInput');
+
+		var volumeIcon = document.getElementById('volumeIcon');
+		var endVideoTime = document.getElementById('endVideoTime');
+		var currentVideoTime = document.getElementById('currentVideoTime');
+		var timelineRange = document.getElementById('timelineRange');
+
+		video.addEventListener('ended',togglePlayIcon,false);
+		video.ontimeupdate = function(){
+			var tempo = secondsToMinutes(video.currentTime);
+			currentVideoTime.innerText = tempo.minutos+":"+tempo.segundos;
+			timelineRange.value = video.currentTime;
+		}
+
+		function sincronizarTempo(){
+			//Sincronizar o tempo do vídeo com o input range
+			video.currentTime = timelineRange.value;
+		}
+
+		function secondsToMinutes(value){
+			let minutos = Math.floor(value/60);
+			let segundos = Math.floor(value%60);
+			if(minutos < 10){
+				minutos = "0"+minutos;
+			}
+			if(segundos < 10){
+				segundos = "0"+segundos;
+			}
+			return {'minutos':minutos,'segundos':segundos};
+		}
+
+		function construct(){
+			var duracao = secondsToMinutes(video.duration);
+			endVideoTime.innerText = duracao.minutos+":"+duracao.segundos;
+			timelineRange.max = video.duration;
+		}
+		function togglePlayIcon(){
+			video.paused?btnPlayIcon.innerHTML='<i class="fas fa-play"></i>':btnPlayIcon.innerHTML='<i class="fas fa-pause"></i>';
+		}
+		function togglePlay(){
+			if(video.paused){
+				video.play();
+			}
+			else{
+				video.pause();
+			}
+			togglePlayIcon();
+		}
+
+		function pause(){
+			video.pause();
+		}
+
+		function setVolume(value){
+			video.volume=value;
+			changeVolumeIcon();
+		}
+		function toggleMute(){
+			video.volume==0?setVolume(1):setVolume(0);
+			volumeRangeInput.value = video.volume*100;
+		}
+		function changeVolumeIcon(){
+			if(video.volume==0){
+				volumeIcon.innerHTML="<i class='fas fa-volume-mute'></i>";
+			}else if(video.volume<0.5){
+				volumeIcon.innerHTML="<i class='fas fa-volume-down'></i>";
+			}else{
+				volumeIcon.innerHTML="<i class='fas fa-volume-up'></i>";
+			}
+		}
+		window.onload = function(){
+			construct();
+		}
+
+
+	</script>
+</body>
+</html>
